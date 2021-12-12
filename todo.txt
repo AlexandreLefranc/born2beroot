@@ -1,0 +1,26 @@
+TODO
+
+1/ Creer un minimum de 2 partitions chiffrees en utilisant LVM
+2/ Se renseigner sur la diff aptitude et apt
+3/ Se renseigner sur SELinux et AppArmor
+4/ Ouvrir un port SSH 4242 uniquement non accessible avec l'utilisateur root (ufw)
+5/ Comprendre la creation de nouveau compte et ses acces via SSH
+6/ Rendre le pare-feu actif au lancement de la machine
+7/ hostname de la machine est le login 42
+8/ Savoir changer le hostname de la machine
+9/ Politique de mdp fort[*]
+10/ installer et configurer sudo selon une pratique stricte[**]
+11/ Set up un user avec mon login en plus du root
+12/ l'utilisateur alefranc appartiendra aux groupe user42 et sudo
+13/ Savoir creer un nouvel utilisateur et assigner des groupes
+14/ Mettre en place un script monitoring.sh cronné toutes les 10 mins sur tous les terminaux (wall?)
+
+
+[*] Expire tous les 30jours / mini 2 jours avant de pouvoir remodifier un mdp / avertissement 7j avants expliration / 10 char mini dont maj, chiffre et pas plus de 3 char identique consecutif / pas le nom d'utilisateur dans le mdp / sauf pour root qui doit contenir au moins 7 chars different du mdp precedent
+
+[**] Auth as sudo limite a 3 try / Message perso en cas de mauvais mdp sudo / chaque action sudo loggé dans /var/log/sudo/ / Mode tty activé / Restriction des paths de sudo
+
+head -n 2 /etc/os-release
+/usr/sbin/aa-status
+ss -tunlp
+/usr/sbin/ufw status
