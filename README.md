@@ -9,7 +9,7 @@ apt install vim
 
 ## Create 2 encrypted partitions using LVM
 
-Done automatically in the Debian guided installer 
+Done automatically in the Debian guided installer
 
 ```
 lsblk
@@ -24,15 +24,18 @@ lsblk
 https://linuxhint.com/ssh_virtualbox_guest/
 https://www.golinuxcloud.com/ssh-command-in-linux/
 https://www.golinuxcloud.com/ssh-into-virtualbox-vm/
+https://askubuntu.com/questions/958440/can-not-change-ssh-port-server-16-04
 
 ```
 apt install ssh
 ```
 
-In `/etc/ssh/ssh_config` :
+In `/etc/ssh/sshd_config` :
 
 - modify `# Port 22` to `Port 4242`
 - Add `PermitRootLogin no`
+
+Check listening port using `ss -tulnp`
 
 Mise en place d'un nouveau compte ?
 
@@ -101,7 +104,7 @@ groupadd user42
 usermod -a -G user42,sudo alefranc
 ```
 
-NB : 
+NB :
 
 - --create-home => -m
 - --password    => -p
@@ -128,7 +131,7 @@ Using printf should work fine.
 - Connexions TCP :
 - User log : `who | wc -l`
 - Network :
-- Sudo : 
+- Sudo :
 
 Save in /opt/monitoring.sh
 
