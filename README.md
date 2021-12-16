@@ -69,23 +69,24 @@ https://www.tecmint.com/sudoers-configurations-for-setting-sudo-in-linux/
 
 ```
 apt install sudo
-usermod -aG user sudo
+usermod -aG sudo alefranc
 ```
 
 Add in `/etc/sudoers` using `visudo` command :
 
 - `Defaults	passwd_tries=3`
-- `Defaults	badpass_message="Password is wrong, please try again"`
+- `Defaults	badpass_message="Bad luck dude !"`
 - `Defaults	logfile="/var/log/sudo/sudo.log"`
 - `Defaults	log_input,log_output`
 - `Defaults	requiretty`
 - `Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"`
 
-Remember to `mkdir -p /var/log/sudo/`
+Remember to `mkdir -p /var/log/sudo/` and `touch /var/log/sudo/sudo.log`
 
 ## Creer un utilisateur alefranc appartenant aux groupes user42 et sudo
 
 https://www.techrepublic.com/article/how-to-create-users-and-groups-in-linux-from-the-command-line/
+https://unix.stackexchange.com/questions/55564/addgroup-vs-groupadd
 
 Create a new user `useradd --create-home alefranc --password PASSWORD`.
 
@@ -102,6 +103,15 @@ useradd -m alefranc
 passwd alefranc
 groupadd user42
 usermod -a -G user42,sudo alefranc
+```
+
+Simplier method :
+
+```
+adduser alefranc
+addgroup user42
+addgroup alefranc user42
+addgroup alefranc sudo
 ```
 
 NB :
