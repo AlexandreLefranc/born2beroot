@@ -59,6 +59,7 @@ Update the name in `/etc/hosts`
 ## Mise en place d'une politique de mdp fort
 
 https://www.lifewire.com/create-users-useradd-command-3572157
+https://ostechnix.com/how-to-set-password-policies-in-linux/
 
 /etc/login.defs
 /etc/default/useradd
