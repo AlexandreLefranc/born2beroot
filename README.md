@@ -26,6 +26,10 @@ https://www.golinuxcloud.com/ssh-command-in-linux/
 https://www.golinuxcloud.com/ssh-into-virtualbox-vm/
 https://askubuntu.com/questions/958440/can-not-change-ssh-port-server-16-04
 
+About NAT and bridge adapter
+[one](https://linuxhint.com/use-virtualbox-bridged-adapter/)
+[two](https://www.malekal.com/vmware-differences-nat-vs-bridged-vs-host-only/)
+
 ```
 apt install ssh
 ```
@@ -33,9 +37,18 @@ apt install ssh
 In `/etc/ssh/sshd_config` :
 
 - modify `# Port 22` to `Port 4242`
-- Add `PermitRootLogin no`
+- Modify `PermitRootLogin` to `yes`
 
-Check listening port using `ss -tulnp`
+Reload the sshd service `systemctl force-reload sshd`
+[1](https://askubuntu.com/questions/105200/what-is-the-difference-between-service-restart-and-service-reload)
+
+Set the VirtualBox adapter to "Bridge" and connect using 192.168.x.x ip address.
+
+NB :
+
+- Check listening port using `ss -tulnp`
+- Get my IP using `hostname -I` or `ip a`
+
 
 Mise en place d'un nouveau compte ?
 
