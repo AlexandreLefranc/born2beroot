@@ -149,12 +149,12 @@ Using printf should work fine.
 - vCPU(s) : `cat /proc/cpuinfo | grep processor | wc -l`
 - Mem Usage :
 - Disk Usage :
-- CPU load : `cat /proc/loadavg | cut -d' ' -f1,2,3`
-- Last boot : `who --boot | cut -d' ' -f13,14`
-- LVM use :
+- CPU load : `cat /proc/loadavg | awk '{print $1, $2, $3}'`
+- Last boot : `who --boot | awk '{print $3, $4}'` or `uptime --since`
+- LVM use : `lvm lvs | wc -l | awk '{if ($0 > 0) {print "yes"} else {print "no"}}'`
 - Connexions TCP :
 - User log : `who | wc -l`
-- Network :
+- Network : `hostname -I | awk '{print $1}'` + `ip a | awk '/ether/{print $2}'`
 - Sudo :
 
 Save in /opt/monitoring.sh
