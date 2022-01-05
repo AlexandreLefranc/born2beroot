@@ -3,9 +3,36 @@
 Encryption pw : test
 root pw : toortoor
 
+## Abstract
+
+Remove AppArmor profiles
+
 ```
-apt install vim
+cd /etc/apparmor.d/
+rm lsb_release nvidia_modprobe
+aa-remove-unknown
 ```
+
+Set up SSH port 4242 and UFW
+
+```
+apt install ssh ufw
+
+ufw enable
+ufw allow 4242
+
+nano /etc/ssh/sshd_config
+	Port 4242
+	PermitRootLogin no
+systemctl force-reload sshd
+```
+
+
+
+
+## Some help
+
+https://github.com/caroldaniel/42sp-cursus-born2beroot
 
 ## Create 2 encrypted partitions using LVM
 
@@ -17,7 +44,13 @@ lsblk
 
 ## Differences Aptitude and Apt
 
-## Difference SELinux and AppArmor
+## Difference SELinux and AppArmor + Clean AppArmor
+
+To remove unwanted profile in AppArmor :
+
+- `cd /etc/apparmor.d/`
+- `rm lsb_release nvidia_modprobe`
+- `aa-remove-unknown`
 
 ## Open 4242 port for ssh but not for root
 
@@ -29,6 +62,7 @@ https://askubuntu.com/questions/958440/can-not-change-ssh-port-server-16-04
 About NAT and bridge adapter
 [one](https://linuxhint.com/use-virtualbox-bridged-adapter/)
 [two](https://www.malekal.com/vmware-differences-nat-vs-bridged-vs-host-only/)
+[three](https://www.virtualbox.org/manual/ch06.html)
 
 ```
 apt install ssh
@@ -37,7 +71,7 @@ apt install ssh
 In `/etc/ssh/sshd_config` :
 
 - modify `# Port 22` to `Port 4242`
-- Modify `PermitRootLogin` to `yes`
+- Modify `PermitRootLogin` to `no`
 
 Reload the sshd service `systemctl force-reload sshd`
 [1](https://askubuntu.com/questions/105200/what-is-the-difference-between-service-restart-and-service-reload)
@@ -51,6 +85,12 @@ NB :
 
 
 Mise en place d'un nouveau compte ?
+
+## Set static IP
+
+https://www.tecmint.com/set-add-static-ip-address-in-linux/
+https://linuxconfig.org/how-to-setup-a-static-ip-address-on-debian-linux
+
 
 ## Installer UFW
 
@@ -71,8 +111,9 @@ Update the name in `/etc/hosts`
 
 ## Mise en place d'une politique de mdp fort
 
-https://www.lifewire.com/create-users-useradd-command-3572157
-https://ostechnix.com/how-to-set-password-policies-in-linux/
+[Link](https://www.lifewire.com/create-users-useradd-command-3572157)
+[Link](https://ostechnix.com/how-to-set-password-policies-in-linux/)
+[Link](https://computingforgeeks.com/enforce-strong-user-password-policy-ubuntu-debian/)
 
 /etc/login.defs
 /etc/default/useradd
@@ -160,3 +201,37 @@ Using printf should work fine.
 Save in /opt/monitoring.sh
 
 cron it
+
+
+
+
+
+
+
+
+# BONUS
+
+## Partitioning
+
+- Manual
+- Select drive
+- Create 2 partitions
+	- 500 MB primary ext2 mounted at /boot
+	- All free space in logical partition with no fs
+- Configure encrypted partition and select the logical partition
+- Select the encrypted partition and set the fs to "Physical Volume for LVM"
+- Configure the LVM
+	- Create volume group "LVMGroup" on sda5_crypt
+	- Create as many logical volume as necessary
+- Select each LV and choose ext4 and mount point (except for SWAP)
+
+
+
+
+
+
+
+
+
+
+
