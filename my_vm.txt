@@ -1,5 +1,0 @@
-crypt pw : test
-root pw : root
-
-Commands:
-
