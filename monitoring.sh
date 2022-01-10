@@ -19,15 +19,26 @@ CPULOAD=$(cat /proc/loadavg | awk '{print $1}')
 
 LASTBOOT=$(uptime --since)
 
+LVMUSE=$(lvdisplay | grep "Logical volume" | wc -l | awk '{if ($1 > 0) {print "yes"} else {print "no"}}')
+
+TCPCON=$(cat /proc/net/sockstat | awk '$1 == "TCP:" {print $3}')
+
+USERLOG=$(users | wc -w)
+
+IPADDR=$(hostname -I | awk '{print $1}')
+MACADDR=$(ip a | awk '$1 == "link/ether" {print $2}')
+
+SUDO=$(cat /var/log/sudo/sudo.log | grep COMMAND | wc -l)
+
 echo "#Architecture: $ARCHI"
 echo "#CPU physical: $PCPU"
 echo "#vCPU: $VCPU"
 echo "#Memory Usage: $MEMUSE/$MEMTOT MB ($MEMPCT%)"
 echo "#Disk Usage: $DSKUSE/$DSKTOT GB ($DSKPCT)"
-echo "#CPU load: "
+echo "#CPU load: $CPULOAD"
 echo "#Last boot: $LASTBOOT"
-echo "#LVM use: $VAR"
-echo "#Connexions TCP: $VAR"
-echo "#User log: $VAR"
-echo "#Network: $VAR"
-echo "#Sudo: $VAR"
+echo "#LVM use: $LVMUSE"
+echo "#Connexions TCP: $TCPCON ESTABLISHED"
+echo "#User log: $USERLOG"
+echo "#Network: IP $IPADDR ($MACADDR)"
+echo "#Sudo: $SUDO"
