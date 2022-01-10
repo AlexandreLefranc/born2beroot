@@ -17,12 +17,15 @@ DSKPCT=$(df --total --block-size=G | grep total | tr -d 'G' | awk '{print $5}')
 
 CPULOAD=$(cat /proc/loadavg | awk '{print $1}')
 
+LASTBOOT=$(uptime --since)
+
 echo "#Architecture: $ARCHI"
 echo "#CPU physical: $PCPU"
 echo "#vCPU: $VCPU"
 echo "#Memory Usage: $MEMUSE/$MEMTOT MB ($MEMPCT%)"
 echo "#Disk Usage: $DSKUSE/$DSKTOT GB ($DSKPCT)"
 echo "#CPU load: "
+echo "#Last boot: $LASTBOOT"
 echo "#LVM use: $VAR"
 echo "#Connexions TCP: $VAR"
 echo "#User log: $VAR"

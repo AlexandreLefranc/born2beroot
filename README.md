@@ -1,16 +1,36 @@
 # Born2BeRoot
 
 Encryption pw : test
+
 root pw : toortoor
 
-## Abstract
+It might be necessary to add French locale in addition of system locale to avoid warning messages using `ssh`
+
+```
+sudo dpkg-reconfigure locales
+
+[x] fr_FR.UTF-8
+```
+
+# Abstract
 
 Remove AppArmor profiles
 
 ```
-cd /etc/apparmor.d/
-rm lsb_release nvidia_modprobe
+rm /etc/apparmor.d/lsb_release /etc/apparmor.d/nvidia_modprobe
 aa-remove-unknown
+```
+
+Enable static IP
+
+```
+nano /etc/network/interfaces
+	iface enp0s3 inet static
+		address 192.168.1.142
+		netmask 255.255.255.0
+		gateway 192.168.1.254
+
+reboot
 ```
 
 Set up SSH port 4242 and UFW
@@ -27,8 +47,67 @@ nano /etc/ssh/sshd_config
 systemctl force-reload sshd
 ```
 
+Update hostname
 
+```
+hostnamectl set-hostname alefranc42
+nano /etc/hosts
+	127.0.1.1	alefranc42
+```
 
+Strong sudo policy
+
+```
+apt install sudo
+mkdir -p /var/log/sudo
+touch /var/log/sudo/sudo.log
+
+visudo /etc/sudoers.d/sudoers_conf
+	Defaults	passwd_tries=3
+	Defaults	badpass_message="Bad luck dude !"
+	Defaults	logfile="/var/log/sudo/sudo.log"
+	Defaults	log_input,log_output
+	Defaults	requiretty
+
+chmod 440 /etc/sudoers.d/sudoers_conf
+
+service sudo reload
+
+addgroup alefranc sudo
+```
+
+Strong user password policy
+
+```
+nano /etc/login.defs
+	PASS_MAX_DAYS	30
+	PASS_MIN_DAYS	2
+	PASS_WARN_AGE	7
+
+apt install libpam-pwquality
+
+nano /etc/pam.d/common-password
+	password    requisite      pam_pwquality.so retry=3 minlen=10 maxrepeat=3 ucredit=-1 dcredit=-1 difok=7 reject_username enforce_for_root
+
+/opt/
+```
+
+Create groups and user + assign users to groups + delete user
+
+```
+addgroup user42
+adduser bob42
+addgroup bob42 user42
+addgroup bob42 sudo
+deluser --remove-home bob42
+```
+
+Monitoring and cron
+
+```
+crontab -e
+	*/10 * * * * wall `/opt/monitoring.sh`
+```
 
 ## Some help
 
@@ -43,6 +122,8 @@ lsblk
 ```
 
 ## Differences Aptitude and Apt
+
+- 
 
 ## Difference SELinux and AppArmor + Clean AppArmor
 
@@ -91,6 +172,33 @@ Mise en place d'un nouveau compte ?
 https://www.tecmint.com/set-add-static-ip-address-in-linux/
 https://linuxconfig.org/how-to-setup-a-static-ip-address-on-debian-linux
 
+Run `ip a` to get dhcp ip and mask
+
+Example `192.168.1.2/24` means :
+
+- IP is `192.168.1.2`
+- Mask is `255.255.255.0` (24 first bits are 1)
+
+Run `ip route | grep default` to get gateway (`192.168.1.254` for me)
+
+`ss -tulnp` shows DHCP is active
+
+Usually, DHCP ranges from 1 to 100. So let create a static IP out of this range : `192.168.1.142`
+
+Open file `/etc/network/interfaces` with `nano`
+
+Replace the `dhcp` term by `static` and add address, mask and gateway of new static IP as follow :
+
+```
+iface enp0s3 inet static
+	address 192.168.1.142
+	netmask 255.255.255.0
+	gateway 192.168.1.254
+```
+
+Reboot to apply changes
+
+Check if internet still works : `ping 42l.fr`
 
 ## Installer UFW
 
@@ -116,7 +224,58 @@ Update the name in `/etc/hosts`
 [Link](https://computingforgeeks.com/enforce-strong-user-password-policy-ubuntu-debian/)
 
 /etc/login.defs
+
 /etc/default/useradd
+
+Settings about
+
+- expiration to 30 days
+- set minimum time before new change to 2
+- warning before expiration date to 7
+
+are in `/etc/login.defs`
+
+```
+# Password aging controls:
+#       PASS_MAX_DAYS   Maximum number of days a password may be used.
+#       PASS_MIN_DAYS   Minimum number of days allowed between password changes.
+#       PASS_WARN_AGE   Number of days warning given before a password expires.
+#
+PASS_MAX_DAYS   30
+PASS_MIN_DAYS   2
+PASS_WARN_AGE   7
+
+```
+
+For more password policy, we have to install `pam_pwquality`
+
+```
+apt install libpam-pwquality
+```
+
+Then open `/etc/pam.d/common-password` and add to this line 
+
+```
+password   requisite   pam_pwquality.so retry=3
+```
+
+This fields
+
+```
+password    requisite      pam_pwquality.so retry=3 minlen=10 maxrepeat=3 ucredit=-1 dcredit=-1 difok=7 reject_username enforce_for_root
+```
+
+
+This doesn't apply to already existing users. To enforce it, we should to it manually : run script `/opt/chage_update_user user`
+
+Or manually
+
+```
+chage -M 30 user
+chage -m 2 user
+chage -W 7 user
+```
+
 
 ## Installer et configurer sudo selon une pratique stricte
 
@@ -176,7 +335,15 @@ NB :
 - --groups      => -g
 - list of users `cat /etc/passwd`
 - list of groups `cat /etc/group`
-- remove user (-r for removing home dir) `userdel -r user`
+- remove user (-r for removing home dir) `userdel -r user` or `deluser --remove-home user`
+
+To know which group a user is in `groups user` or `id user` or `getent group | grep user`
+
+To list all users `cat /etc/passwd` or `getent passwd`
+
+To list all real users `getent passwd {1000..3000}` ([source](https://phoenixnap.com/kb/how-to-list-users-linux))
+
+To list all groups `cat /etc/group` or `getent group`
 
 ## Mise en place du monitoring
 
@@ -200,13 +367,34 @@ Using printf should work fine.
 
 Save in /opt/monitoring.sh
 
-cron it
+To set up cron
 
+[link](https://phoenixnap.com/kb/set-up-cron-job-linux)
 
+Run `sudo crontab -e` and add this line
 
+```
+*/10 * * * * wall `/opt/monitoring.sh`
+```
 
+Synthax :
 
+```
+ # Example of job definition:
+ # .---------------- minute (0 - 59)
+ # |  .------------- hour (0 - 23)
+ # |  |  .---------- day of month (1 - 31)
+ # |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+ # |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7)
+ # |  |  |  |  |
+ # *  *  *  *  *   command to be executed
+```
 
+We can list all cron job using `crontab -l`
+
+Note that you can run crontab as simple user. To edit crontab of specific user, run `crontab -u user -e`
+
+Cron jobs don't need any reload / restart / reboot to apply. 
 
 
 # BONUS
