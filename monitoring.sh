@@ -11,24 +11,24 @@ MEMTOT=$(free -m | grep Mem | awk '{print $2}')
 MEMUSE=$(free -m | grep Mem | awk '{print $3}')
 MEMPCT=$(awk -v use=$MEMUSE -v tot=$MEMTOT 'BEGIN {printf "%.2f", use/tot*100}')
 
-DSKTOT=$(df --total --block-size=G | grep total | tr -d 'G' | awk '{print $2}')
-DSKUSE=$(df --total --block-size=G | grep total | tr -d 'G' | awk '{print $3}')
-DSKPCT=$(df --total --block-size=G | grep total | tr -d 'G' | awk '{print $5}')
+DSKTOT=$(df --total -h / /home | grep total | tr -d 'G' | awk '{print $2}')
+DSKUSE=$(df --total -h / /home | grep total | tr -d 'G' | awk '{print $3}')
+DSKPCT=$(df --total -h / /home | grep total | tr -d 'G' | awk '{print $5}')
 
 CPULOAD=$(cat /proc/loadavg | awk '{print $1}')
 
 LASTBOOT=$(uptime --since)
 
-LVMUSE=$(lvdisplay | grep "Logical volume" | wc -l | awk '{if ($1 > 0) {print "yes"} else {print "no"}}')
+LVMUSE=$(/sbin/lvdisplay | grep "Logical volume" | wc -l | awk '{if ($1 > 0) {print "yes"} else {print "no"}}')
 
 TCPCON=$(cat /proc/net/sockstat | awk '$1 == "TCP:" {print $3}')
 
-USERLOG=$(users | wc -w)
+USERLOG=$(users | xargs -n1 | sort | uniq | wc -l)
 
 IPADDR=$(hostname -I | awk '{print $1}')
 MACADDR=$(ip a | awk '$1 == "link/ether" {print $2}')
 
-SUDO=$(cat /var/log/sudo/sudo.log | grep COMMAND | wc -l)
+SUDO=$(cat /var/log/sudo/sudo.log | grep -a COMMAND | wc -l)
 
 echo "#Architecture: $ARCHI"
 echo "#CPU physical: $PCPU"

@@ -2,7 +2,10 @@
 
 Encryption pw : test
 
-root pw : toortoor
+root pw : toortoor / Sapermun42
+ 
+
+users pw : Zxcvbnm,./1
 
 It might be necessary to add French locale in addition of system locale to avoid warning messages using `ssh`
 
@@ -88,8 +91,6 @@ apt install libpam-pwquality
 
 nano /etc/pam.d/common-password
 	password    requisite      pam_pwquality.so retry=3 minlen=10 maxrepeat=3 ucredit=-1 dcredit=-1 difok=7 reject_username enforce_for_root
-
-/opt/
 ```
 
 Create groups and user + assign users to groups + delete user
@@ -120,6 +121,18 @@ Done automatically in the Debian guided installer
 ```
 lsblk
 ```
+
+Info about warning message before decrypt disk [here](https://askubuntu.com/questions/1193625/volume-group-ubuntu-vg-not-found-cannot-process-volume-group-ubuntu-vg)
+
+About the after decryption message : `*ERROR* Failed to send host log message` info [here](https://unix.stackexchange.com/questions/502540/why-does-drmvmw-host-log-vmwgfx-error-failed-to-send-host-log-message-sh)
+
+Fixed it editing `/etc/default/grub`
+
+```
+GRUB_CMDLINE_LINUX_DEFAULT="quiet nomodeset"
+```
+
+Then `update-grub`
 
 ## Differences Aptitude and Apt
 
@@ -265,6 +278,7 @@ This fields
 password    requisite      pam_pwquality.so retry=3 minlen=10 maxrepeat=3 ucredit=-1 dcredit=-1 difok=7 reject_username enforce_for_root
 ```
 
+Alternatively check `/etc/security/pwquality.conf`
 
 This doesn't apply to already existing users. To enforce it, we should to it manually : run script `/opt/chage_update_user user`
 
