@@ -3,7 +3,6 @@
 Encryption pw : test
 
 root pw : toortoor / Sapermun42
- 
 
 users pw : Zxcvbnm,./1
 
@@ -35,6 +34,19 @@ nano /etc/network/interfaces
 
 reboot
 ```
+
+---
+
+```
+nano /etc/network/interfaces
+	iface enp0s3 inet static
+		address 10.0.2.15/24
+		gateway 10.0.2.2
+
+reboot
+```
+
+
 
 Set up SSH port 4242 and UFW
 
@@ -93,6 +105,8 @@ nano /etc/pam.d/common-password
 	password    requisite      pam_pwquality.so retry=3 minlen=10 maxrepeat=3 ucredit=-1 dcredit=-1 difok=7 reject_username enforce_for_root
 ```
 
+Alternatively edit `/etc/security/pwquality` and uncomment + add `reject_username`
+
 Create groups and user + assign users to groups + delete user
 
 ```
@@ -136,7 +150,7 @@ Then `update-grub`
 
 ## Differences Aptitude and Apt
 
-- 
+-
 
 ## Difference SELinux and AppArmor + Clean AppArmor
 
@@ -266,7 +280,7 @@ For more password policy, we have to install `pam_pwquality`
 apt install libpam-pwquality
 ```
 
-Then open `/etc/pam.d/common-password` and add to this line 
+Then open `/etc/pam.d/common-password` and add to this line
 
 ```
 password   requisite   pam_pwquality.so retry=3
@@ -278,7 +292,7 @@ This fields
 password    requisite      pam_pwquality.so retry=3 minlen=10 maxrepeat=3 ucredit=-1 dcredit=-1 difok=7 reject_username enforce_for_root
 ```
 
-Alternatively check `/etc/security/pwquality.conf`
+Alternatively check `/etc/security/pwquality.conf` [link](https://www.systutorials.com/docs/linux/man/5-pwquality.conf/)
 
 This doesn't apply to already existing users. To enforce it, we should to it manually : run script `/opt/chage_update_user user`
 
@@ -408,7 +422,7 @@ We can list all cron job using `crontab -l`
 
 Note that you can run crontab as simple user. To edit crontab of specific user, run `crontab -u user -e`
 
-Cron jobs don't need any reload / restart / reboot to apply. 
+Cron jobs don't need any reload / restart / reboot to apply.
 
 
 # BONUS
@@ -426,14 +440,3 @@ Cron jobs don't need any reload / restart / reboot to apply.
 	- Create volume group "LVMGroup" on sda5_crypt
 	- Create as many logical volume as necessary
 - Select each LV and choose ext4 and mount point (except for SWAP)
-
-
-
-
-
-
-
-
-
-
-
